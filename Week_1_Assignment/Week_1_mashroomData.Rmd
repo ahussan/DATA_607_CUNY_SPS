@@ -1,0 +1,30 @@
+---
+title: "Assignment Week 1"
+author: "anjal hussan"
+date: "02/04/2018"
+output: html_document
+---
+
+## Importing the Data
+
+```{R load-data, eval=TRUE}
+theUrl <- "https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
+mushroomsData <- read.table(file = theUrl, header = FALSE, sep = ",")
+
+##write data set to a csv file
+write.table(mushroomsData, file = "mushroomsData.csv", sep = ",")
+head(mushroomsData)
+```
+###Select columns and create data sets
+Let's select few columns to work with. We are going to select the following columns:
+  Edible/Poisonous, Cap-Shape, Cap-Surface, Cap-color and Odor
+
+
+```{r create data sets, eval=TRUE}
+###
+firstDF
+
+```
+
+
+##End of file
