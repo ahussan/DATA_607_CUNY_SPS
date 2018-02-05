@@ -5,15 +5,25 @@ date: "02/04/2018"
 output: html_document
 ---
 
-## Importing the Data
+## Importing the Data and write file
 
 ```{R load-data, eval=TRUE}
 theUrl <- "https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
-mushroomsData <- read.table(file = theUrl, header = FALSE, sep = ",")
+mushroomsData <- read.table(file = theUrl, header = FALSE, sep = ",", stringsAsFactors = FALSE)
 
 ##write data set to a csv file
 write.table(mushroomsData, file = "mushroomsData.csv", sep = ",")
+```
+
+Once written in .csv file - I uploaded this file to github and now loading data from github link
+
+```{R load from github}
+giturl = "https://raw.githubusercontent.com/ahussan/DATA_607_CUNY_SPS/master/Week_1_Assignment/mushroomsData.csv"
+mushroomsData = read.table(giturl, sep = ",", stringsAsFactors = FALSE)
 head(mushroomsData)
+
+cat("Number of rows in the dataset: ", nrow(mushroomsData),"\n")
+cat("Number of columns in the dataset: ", ncol(mushroomsData), "\n")
 ```
 ###Select columns and create data sets
 Let's select few columns to work with. We are going to select the following columns:
@@ -22,9 +32,96 @@ Let's select few columns to work with. We are going to select the following colu
 
 ```{r create data sets, eval=TRUE}
 ###
-firstDF
+firstDF <- mushroomsData[, 1:4] 
+secondDf <- mushroomsData[, 6]
+##combine first and second data frames
+mymushrooms = cbind(firstDF, secondDf)
+head(mymushrooms)
+
+```
+###Add column header
+```{R column header}
+colnames(mymushrooms) <- c("Edible/Poisonous","Cap-Shape","Cap-Surface","Cap-Color","Odor");
+head(mymushrooms)
+```
+
+###Data transformation
+Let's write few functions to transform the data in each column
+```{R functions}
+
+transformClassData <- function(key){
+  switch (key,
+    'p' = 'poisonous',
+    'e' = 'edible'
+  )
+}
+
+transformCapShapeData <- function(key){
+  switch (key,
+          'b' = 'bell',
+          'c' = 'conical',
+          'x' = 'convex',
+          'f' = 'flat',
+          'k' = 'knobbed',
+          's' = 'sunken'
+  )
+}
+
+transformCapSurfaceData <- function(key){
+  switch (key,
+          'f' = 'fibrous',
+          'g' = 'grooves',
+          'y' = 'scaly',
+          's' = 'smooth'
+  )
+}
+
+transformCapColorData <- function(key){
+  switch (key,
+          'n' = 'brown',
+          'b' = 'buff',
+          'c' = 'cinnamon',
+          'g' = 'gray',
+          'r' = 'green',
+          'p' = 'pink',
+          'u' = 'purple',
+          'e' = 'red',
+          'w' = 'white',
+          'y' = 'yellow'
+  )
+}
+
+transformOdorData <- function(key){
+  switch (as.character(key),
+          'a' = 'almond',
+          'l' = 'anise',
+          'c' = 'creosote',
+          'y' = 'fishy',
+          'f' = 'foul',
+          'm' = 'musty',
+          'n' = 'none',
+          'p' = 'pungent',
+          's' = 'spicy'
+  )
+}
 
 ```
 
+Now that we have all the functions in place, we can replace the abbreviations with the corresponding values:
 
-##End of file
+```{R apply transformation}
+mymushrooms$`Edible/Poisonous` <- sapply(mymushrooms$`Edible/Poisonous`, transformClassData)
+mymushrooms$`Cap-Shape` <- sapply(mymushrooms$`Cap-Shape`, transformCapShapeData)
+mymushrooms$`Cap-Surface` <- sapply(mymushrooms$`Cap-Surface`, transformCapSurfaceData)
+mymushrooms$`Cap-Color` <- sapply(mymushrooms$`Cap-Color`, transformCapColorData)
+mymushrooms$Odor <- sapply(mymushrooms$Odor, transformOdorData)
+```
+
+###Verify our data fram
+Let's take a look to the head of our data fram:
+```{R result}
+head(mymushrooms)
+```
+
+
+####End of this file
