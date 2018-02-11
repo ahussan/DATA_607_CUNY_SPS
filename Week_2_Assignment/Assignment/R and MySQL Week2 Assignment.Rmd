@@ -1,0 +1,59 @@
+---
+title: "R and MySQL Week2 Assignment"
+author: "anjal hussan"
+date: "2/11/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=FALSE, echo=FALSE}
+sqlPassword = '*******'
+```
+
+### Establish Connections
+
+```{r, warning=FALSE, message=FALSE}
+
+dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_74.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
+library(rJava)
+
+if (!require("DT")) install.packages('DT')
+if (!require("RMySQL")) install.packages('RMySQL')
+if (!require("ggplot2")) install.packages('ggplot2')
+
+##Actual SQLPassword was assigned to a variable called sqlPassword
+##(Assignment code chunk was being hidden by using echo=false)
+mydb = dbConnect(MySQL(), user='root', dbname='MOVIE', host='localhost', password=sqlPassword) 
+print('list of my tables')
+dbListTables(mydb)
+```
+
+### Create dataframe from Connection Query
+
+```{r, message=FALSE}
+query = dbSendQuery(mydb, 
+    "SELECT p.FirstName, p.LastName, m.movie_name, r.review_rank 
+    FROM MOVIE.Reviewer p
+    	LEFT JOIN MOVIE.reviews r
+    		ON p.Reviewer_id = r.Reviewer_id
+    	LEFT JOIN MOVIE.movies m
+    		ON m.movie_id = r.movie_id
+    	ORDER BY m.movie_name;")
+movie.df <- fetch(query)
+dbDisconnect(mydb)
+
+datatable(movie.df, options = list(pageLength = 5))
+```
+
+### Quick Viz
+
+```{r}
+movie.df$movie_name <- as.factor(movie.df$movie_name)
+ggplot(movie.df) + geom_bar(aes(movie_name, review_rank, fill=movie_name), stat="summary", fun.y="mean") + labs(x="Movies", y="Mean Review", title="Mean Movie Review") + theme(axis.text.x=element_blank())
+```
