@@ -1,6 +1,6 @@
-####Assignment - Week2
+#### Assignment - Week2
 
-###Establish connection between R and SQL
+### Establish connection between R and SQL
 
 **Problem Statement:**
 Choose six recent popular movies. Ask at least five people that you know (friends, family, classmates, imaginary friends) to rate each of these movie that they have seen on a scale of 1 to 5.
