@@ -1,0 +1,103 @@
+---
+title: "Week3HW Regular Expressions"
+author: "anjal hussan"
+date: "2/18/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 3. Extract Alpha RegEx
+
+```{r, comment=NA, warning=FALSE}
+library(stringr)
+
+raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert"   
+
+name <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+name
+```
+
+(a) Use the tools of this chapter to rearrange the vector so that all elements conform to the standard first_name last_name.
+(b) Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+(c) Construct a logical vector indicating whether a character has a second name.
+
+```{r, comment=NA}
+### Function to extract last names
+get_last <- function(list){
+    last <- str_extract(list, '[[:alpha:]]{1,}\\,|\\b [[:alpha:]]{2,}')
+    last <- str_extract(last, "[[:alpha:]]{1,}")
+    last
+}
+
+### Function to extract first names
+get_first <- function(list) {
+    first <- str_extract(list, '[[:alpha:]]{1,} |\\. [[:alpha:]]{1,}|\\, [[:alpha:]]{2,}')
+    first <- str_extract(first, "[[:alpha:]]{1,}")
+    first
+}
+
+# Create df
+allNameInDF <- data.frame(first = get_first(name), 
+                      last = get_last(name))
+
+allNameInDF$fullname <- paste0(allNameInDF$first, " ", allNameInDF$last)
+
+# Find if title exists
+allNameInDF$title <- str_detect(name, 'Dr.|Rev.')
+
+# Find if Middle name exists
+allNameInDF$MiddleName <- str_detect(name, ' [:alpha:]{1}\\. ')
+
+# Print DF
+allNameInDF
+```
+
+## 4. RegEx Construction
+
+Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression.
+
+#### a)
+This regex will return a string of one or more numbers followed by a '$' sign.  
+
+```{r, comment=NA}
+#(a) [0-9]+\\$
+a <- "892$xp09$.2*.2$oa$"
+unlist(str_extract_all(a, '[0-9]+\\$'))
+```
+
+#### b)
+This regex will return a string of one to four lowercase alpha characters so long as they are bounded by non-word characters. Note that digits are considered to be word characters, thus the "two" does not show up because the "3" is not a boundary, and is not [a-z].   
+
+```{r, comment=NA}
+#(b) \b[a-z]{1,4}\\b
+b <- "u-one 3two.three FOUR%four$;etc U pp Er"
+unlist(str_extract_all(b, '\\b[a-z]{1,4}\\b'))
+```
+
+#### c)
+This regex will return any string that ends with '.txt'.   If it does not end with .txt, it will not return anything.
+```{r, comment=NA}
+#(c) .*?\\.txt$
+c <- "This$$is Ending with .txt"
+c2 <- "this .txt is not ending with txt"
+unlist(str_extract_all(c, '.*?\\.txt$'))
+```
+
+#### d) dd/dd/dddd
+This regex will return any string in the form 'dd/dd/dddd' where 'd' is a digit.   This is a common form for dates.  
+```{r, comment=NA}
+#(d) \\d{2}/\\d{2}/\\d{4}
+d <- "09/10/2016 10/12/2014 2015/01/02"
+unlist(str_extract_all(d, '\\d{2}/\\d{2}/\\d{4}'))
+```
+
+#### e)
+This regex returns any string that starts with a ``<text>`` and ends with ``</text>``. 
+```{r, comment=NA}
+#(e) <(.+?)>.+?</\\1>
+e <- "<div>HTML tags </div> <ol><li>This is LI Tag</li><li>Again LI Tag</li></ol>"
+unlist(str_extract_all(e, '<(.+?)>.+?</\\1>'))
+```
