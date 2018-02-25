@@ -1,0 +1,143 @@
+---
+title: "Project 1 - Chess Rating"
+author: "anjal hussan"
+date: "2/24/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+### Load required package
+
+```{r package, warning = FALSE, message=FALSE}
+if (!require('DT')) install.packages('DT')
+if (!require('stringr')) install.packages('stringr')
+if (!require('ggplot2')) install.packages('ggplot2')
+```
+
+## load tournament information
+
+```{r}
+sourcefile = 'https://raw.githubusercontent.com/ahussan/DATA_607_CUNY_SPS/master/Project%201/tournamentinfo.txt'
+raw <- readLines('tournamentinfo.txt')
+head(raw)
+```
+### Data Grouping and Splitting
+Our data is laid out in a table, it will be helpful to narrow down the areas our regular expressions to match the pattern
+
+We may be able to extract necessary fields by matching pattern from certain sections of a line.
+
+```{r, comment=NA}
+#Find the table breaks
+b0 <- 0
+b1 <- unname(str_locate_all(pattern = '\\|', raw[5])[[1]][1,1])
+b2 <- unname(str_locate_all(pattern = '\\|', raw[5])[[1]][2,1])
+b3 <- unname(str_locate_all(pattern = '\\|', raw[5])[[1]][3,1])
+b4 <- max(nchar(raw))
+```
+
+In the initial data we can find required data in the following string positions in each line: 
+
+* Section 1 (Number, State): `r b0` - `r b1`
+* Section 2 (Name, Pre-Rating): `r b1` - `r b2`
+* Section 3 (Points): `r b2` - `r b3`
+* Section 4 (Opponent IDs): `r b3` - `r b4`
+
+
+### Data seperating
+
+Now that we have some matched pattern - we will divide into two groups to get our row data in to to section
+
+```{r, comment=NA}
+# Group1 = Num, Name, Points, Opponent IDs
+g1row <- seq(5, 196, 3)
+# Group2 = State, Rating
+g2row <- seq(6, 196, 3)
+# subset for easy searching
+group1 <- raw[g1row]
+group2 <- raw[g2row]
+```
+
+## Data Field Creation and Extraction
+Now we need to extract our desired fields. 
+
+
+### Player Name 
+```{r, comment=NA}
+# Find subsets of player name
+namesub <- substr(group1, b1+1, b2-2)
+namesub <- str_trim(namesub)
+PlayerName <- str_to_title(namesub)
+head(PlayerName)
+```
+
+### Player State
+```{r}
+statesub <- substr(group2, b0, b1-1)
+State <- str_trim(statesub)
+head(State)
+# dataframe
+chess <- data.frame(PlayerName, State)
+```
+
+### Total Points
+```{r}
+pointsub <- substr(group1, b2+1, b3-1)
+head(pointsub)
+chess$TotalPoints <- sprintf("%.1f", as.numeric(pointsub))
+```
+
+### Player Pre-Rating
+
+```{r}
+presub <- substr(group2, b1+1, b2-1)
+presub <- str_extract(presub, ': *\\d{2,}')
+head(presub)
+chess$PreRating <- as.integer(str_extract(presub, '\\d{2,}'))
+```
+
+### Avg Opponent Pre-Rating
+
+```{r}
+oppsub <- substr(group1, b3+1, b4)
+oppsub <- str_extract_all(oppsub, '\\b\\d{1,}')
+oppsub <- as.matrix(oppsub)
+
+calculation <- function(l, p ){
+  temp <- l[p]
+    for (place in temp){
+        rating <- 0
+        counter <- 0
+        for(i in place) {
+            counter <- counter + 1
+            rating <- rating + chess$PreRating[as.numeric(i)]
+        }
+        rating <- round(rating / counter)
+    }
+  return (rating)
+}
+
+chess$AvgOppPreRating <- apply(oppsub, 1, calculation)
+```
+
+## Final Dataset
+
+### Review
+```{r}
+datatable(chess)
+```
+
+### Export in .csv
+
+```{r}
+# export
+write.csv(chess, "chessData.csv", row.names=FALSE)
+```
+
+### Data visualization
+
+```{r}
+x <- ggplot(chess, aes(PreRating, AvgOppPreRating)) + geom_point(aes(color=TotalPoints)) + ggtitle("Pre-Rating VS Avg Opponent Pre-Rating by Total Points Gained")
+x
+```
