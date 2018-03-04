@@ -23,11 +23,11 @@ if (!require("tidyr")) install.packages('tidyr')
 ### Data Import
 
 ```{r}
-airlines <- read.csv("airline.csv")
+airlines <- read.csv("https://raw.githubusercontent.com/ahussan/DATA_607_CUNY_SPS/master/Week5_Assignment/airlineData.csv", strip.white=TRUE)
 knitr::kable(airlines)
 ```
 
-## Data Transformation
+## Data Transformation and Cleaning
 
 ```{r, comment=NA}
 # remove middle NA obs
@@ -38,18 +38,19 @@ airlines[2,1] <- "ALASKA"
 airlines[4,1] <- "AMWEST"
 
 # rename cols
-names(airlines)[c(1,2)] <- c("airline", "status")
+names(airlines)[c(1,2)] <- c("Airline", "Status")
 
 # tidy data
 tidy <- airlines %>% 
     gather(cities, count, 3:7) %>% 
-    spread(status, count)
+    spread(Status, count)
 
 #update col
 names(tidy)[4] <- "ontime"
 
 # let's review our progress
 knitr::kable(tidy)
+
 ```
 
 
@@ -58,30 +59,29 @@ knitr::kable(tidy)
 ### Ratios by City
 
 ```{r}
-#let's get some delay ratios
+#Delay ratios
 tidy <- tidy %>%
     mutate(total=ontime + delayed, delayratio=round(delayed/total, 3)) 
 
-#let's plot these delay ratios
-dotchart(tidy$delayratio, groups = tidy$cities, labels=tidy$airline, main = "Ratio of Delayed Flights by City")
+#Plot these delay ratios
+dotchart(tidy$delayratio, groups = tidy$Airline, labels = tidy$cities , main = "Ratio of Delayed Flights by City")
 ```
 
 
 ### Ratios in Total
 ```{r}
-
 summary <- tidy %>% 
-    group_by(airline) %>% 
+    group_by(Airline) %>% 
     summarise(delayed = sum(delayed), ontime = sum(ontime), total = sum(total)) %>%
     mutate(delayratio = round(delayed/total, 3))
 
 knitr::kable(summary)
 
-#let's plot delay ratios
-dotchart(summary$delayratio, labels=summary$airline, main = "Ratio of Delayed Flights Across All Cities")
+#Plot delay ratios
+dotchart(summary$delayratio, groups = summary$Airline, main = "Ratio of Delayed Flights Across All Cities")
 
 ```
 
 ## Conclusion
 
-The individual city delay ratios by airline show that ALASKA airlines had a lower individual delay ratio than AMWEST in every single city.   However the aggregated data shows that AMWEST had a lower overall delay ratio, due to the larger volume of flights.   
+The individual city delay ratios by airline indicates that ALASKA airlines had a lower individual delay ratio than AMWEST in every single city. But the aggregated data shows that AMWEST had a lower overall delay ratio, due to the larger volume of flights.   
