@@ -1,0 +1,87 @@
+---
+title: "Tidydata"
+author: "anjal hussan"
+date: "3/4/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+## Objective
+Our objective is to take a .csv of untidy data of two airlines and their on time or delayed flying information into multiple destination. Once the data is loaced, we need to transform and tidy the data, and then do an analysis to compare the arrival delays for both airlines.
+
+## Setup
+
+### Environment Prep
+
+```{r, warning=FALSE, message=FALSE}
+if (!require("dplyr")) install.packages('dplyr')
+if (!require("tidyr")) install.packages('tidyr')
+```
+
+### Data Import
+
+```{r}
+airlines <- read.csv("airline.csv")
+knitr::kable(airlines)
+```
+
+## Data Transformation
+
+```{r, comment=NA}
+# remove middle NA obs
+airlines <- airlines[-3,]
+
+# add in missing airline values
+airlines[2,1] <- "ALASKA"
+airlines[4,1] <- "AMWEST"
+
+# rename cols
+names(airlines)[c(1,2)] <- c("airline", "status")
+
+# tidy data
+tidy <- airlines %>% 
+    gather(cities, count, 3:7) %>% 
+    spread(status, count)
+
+#update col
+names(tidy)[4] <- "ontime"
+
+# let's review our progress
+knitr::kable(tidy)
+```
+
+
+## Data Analysis
+
+### Ratios by City
+
+```{r}
+#let's get some delay ratios
+tidy <- tidy %>%
+    mutate(total=ontime + delayed, delayratio=round(delayed/total, 3)) 
+
+#let's plot these delay ratios
+dotchart(tidy$delayratio, groups = tidy$cities, labels=tidy$airline, main = "Ratio of Delayed Flights by City")
+```
+
+
+### Ratios in Total
+```{r}
+
+summary <- tidy %>% 
+    group_by(airline) %>% 
+    summarise(delayed = sum(delayed), ontime = sum(ontime), total = sum(total)) %>%
+    mutate(delayratio = round(delayed/total, 3))
+
+knitr::kable(summary)
+
+#let's plot delay ratios
+dotchart(summary$delayratio, labels=summary$airline, main = "Ratio of Delayed Flights Across All Cities")
+
+```
+
+## Conclusion
+
+The individual city delay ratios by airline show that ALASKA airlines had a lower individual delay ratio than AMWEST in every single city.   However the aggregated data shows that AMWEST had a lower overall delay ratio, due to the larger volume of flights.   
