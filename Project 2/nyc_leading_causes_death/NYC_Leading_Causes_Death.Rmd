@@ -1,0 +1,65 @@
+---
+title: "nyc_leading_causes_death"
+author: "anjal hussan"
+date: "3/11/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+
+### Analyse Leading Causes of Death in NYC
+
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(knitr)
+library(DT)
+
+options(dplyr.width = Inf)
+df <- read.csv("New_York_City_Leading_Causes_of_Death.csv", header=TRUE, sep=",")
+datatable(df)
+
+```
+
+## Analysis:
+
+### 1. Display the leading causes of death each year for men and women.
+
+```{r message=FALSE, warning=FALSE}
+df1 <- df %>% subset(select = c(Sex,Year,Cause.of.Death,Count)) %>% 
+  group_by(Sex,Year) %>%
+  filter(Count == max(Count)) %>% distinct(Sex,Year,Cause.of.Death,Count)
+
+datatable(df1)
+
+```
+
+### 2. Display the leading causes of death each year for each ethnic group.
+
+```{r message=FALSE, warning=FALSE}
+df2 <- df %>% subset(select = c(Ethnicity,Year,Cause.of.Death,Count)) %>% 
+  group_by(Ethnicity,Year) %>%
+  filter(Count == max(Count)) %>% distinct(Ethnicity,Year,Cause.of.Death,Count)
+
+datatable(df2)
+```
+
+### 3. Calculate which cause of death has reduced the most and which has increased the most in the years given.
+
+```{r message=FALSE, warning=FALSE}
+df_3 <- df %>% subset(select = c(Year,Cause.of.Death,Count)) %>%
+  group_by(Year, Cause.of.Death, the_min = min(Count), the_max = max(Count), the_diff = (the_max - the_min)) %>% count(Year, Cause.of.Death, max(the_diff))
+
+datatable(df_3)
+```
+
+### 4. Calculate which cause of death has remained stable over the years given.
+
+```{r message=FALSE, warning=FALSE}
+df_4 <- df %>% subset(select = c(Year,Cause.of.Death,Count)) %>%
+  group_by(Year, Cause.of.Death, the_min = min(Count), the_max = max(Count), the_diff = (the_max - the_min)) %>% count(Year, Cause.of.Death, min(the_diff))
+
+datatable(df_4)
+```
