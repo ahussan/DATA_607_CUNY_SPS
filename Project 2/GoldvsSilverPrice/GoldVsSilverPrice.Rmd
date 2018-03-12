@@ -1,0 +1,198 @@
+---
+title: "Project: Gold vs Silver Price"
+author: "Anjal Hussan"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+#Topic: Correlation between Gold and Silver Prices
+
+####**Introduction:**
+Silver and gold are close substitutes for one another. Both have been used as currency in the pas. There is significant evidence that these metals being an attractive investment and can play a useful role in diversifying risk. There are also economic fundamentals that may act to drive the prices of silver and gold apart.
+
+####**Research question:**
+The main objective of this project is to study the relationship and correlation between prices of silver and gold in commodity market.
+
+####**Data Source:**
+The datasets for this project are from the following sites:
+
+1. https://www.quandl.com/data/LBMA/GOLD-Gold-Price-London-Fixing
+
+2. https://www.quandl.com/data/LBMA/SILVER-Silver-Price-London-Fixing
+
+####**Cases:**
+Each case represents the price of silver and gold for a day. The full dataset represents data for 48 years with approximately 12618 cases.
+
+####**Data Collection: **
+The data is collected from quandl.com
+
+####**Type of study: **
+This is observational study.
+
+####**Response:**
+Price of gold is the response variable. It is numerical continuous variable.
+
+####**Explanatory:**
+The explanatory variable is the price of silver and is numerical.
+
+####Setup
+```{r setup, warning=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(sqldf)
+library(magrittr)
+library(DT)
+```
+
+**Silver and Gold price data are loaded from the datasets**
+
+```{R Gold}
+gold_df <- read.csv(file="GOLD.csv", head=TRUE, sep=",",stringsAsFactors = FALSE) 
+datatable(head(gold_df))
+```
+
+
+```{R SILVER}
+silver_df = read.csv(file="SILVER.csv", head=TRUE, sep=",",stringsAsFactors = FALSE)
+datatable(head(silver_df))
+```
+
+###Data Transformation, Cleanup and Preparation:
+
+Apply tidyr select function and select only columns (Date and USD..AM Price) form gold_df data set that are relevant for our purpose
+```{R transaction_Gold}
+select(gold_df)
+gold_dataSet = select (gold_df, matches("Date|USD..AM"))
+```
+
+
+Apply tidyr mutate functin to identify the price of the metal as gold
+```{R metal}
+gold_dataSet = mutate (gold_dataSet, MetalPrice = "GoldPrice")
+colnames(gold_dataSet)[2] <- "USD"
+datatable(head(gold_dataSet))
+```
+
+Apply tidyr select function and select only columns (Date and USD Price) form silver_df data set that are relevant for our purpose. Also Apply tidyr mutate function to identify the price of the metal as Silver
+
+```{R transaction}
+select(silver_df)
+Silver_dataSet = select (silver_df, matches("Date|USD"))
+silver_df$Date = as.Date(as.character(silver_df$Date))
+Silver_dataSet = mutate (Silver_dataSet, MetalPrice = "SilverPrice")
+datatable(head(Silver_dataSet))
+```
+
+Now combine both data frames (Silver and Gold price data frames) into one consolidated data frame for analysis
+
+```{R rbind}
+Silver_dataSet <- Silver_dataSet[1:nrow(gold_dataSet),1:3]
+gold_dataSet <- gold_dataSet[,1:3]
+#do.call(rbind, gold_dataSet)
+combinedDataSets = rbind(gold_dataSet, Silver_dataSet)
+datatable(head(combinedDataSets))
+```
+
+Apply arrange function to sort the data by Date
+
+```{R arrange}
+combinedDataSets = arrange(combinedDataSets, Date)
+datatable(head(combinedDataSets))
+```
+
+Apply spread function to spread the data for each metal by adding one column for Gold and another for Silver
+
+```{R spread}
+spreadedTotal = spread(combinedDataSets, MetalPrice, USD)
+head(spreadedTotal, 20)
+```
+
+Create a function to calculate the price ratio and round it to 4 decimal digits
+
+```{R Calprice}
+calcPriceRatio = function(goldPrice, silverPrice)
+{
+  round((goldPrice/silverPrice), 4)
+  }
+```
+
+Apply tidyr mutate function to add PriceRatio and transactionYear columns
+
+```{R priceRatio}
+dataSetsWithPriceRatio = mutate(spreadedTotal, PriceRatio=calcPriceRatio(GoldPrice, SilverPrice), transactionYear=substring(Date,1,4))
+tail(dataSetsWithPriceRatio, 20)
+```
+
+Select price data for years from 2001 to 2013
+
+```{R byyear}
+PriceDataYear_2001_2013 = filter(dataSetsWithPriceRatio, transactionYear %in% c("2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013"))
+tail(PriceDataYear_2001_2013, 20)
+summary(PriceDataYear_2001_2013)
+```
+
+##Data Visualization:
+
+**Gold Price Data**
+
+```{R DV_gold}
+ggplot (gold_df, aes(as.Date(Date), USD..AM.)) +
+  geom_line (aes(color="Gold")) +
+  labs (color="Legend") +
+  scale_colour_manual ("", breaks = c("gold"), values = c("goldenrod3")) +
+  ggtitle ("Gold Prices") + theme (plot.title = element_text(lineheight=0.7, face="bold"))
+```
+
+**Gold Price Histogram**
+
+```{R gold_price_histogram}
+ggplot(data=gold_df, aes(gold_df$USD..AM.)) +
+  geom_histogram(aes(fill = ..count..)) +
+  scale_fill_gradient("Count", low = "yellow", high = "goldenrod3")
+```
+
+
+**Silver Price Data**
+
+```{R DV_Silver}
+ggplot (silver_df, aes(as.Date(Date), USD)) +
+  geom_line (aes(color="Silver")) +
+  labs (color="Legend") +
+  scale_colour_manual ("", breaks = c("silver"), values = c("ivory4")) +
+  ggtitle ("Silver Prices") +
+  theme (plot.title = element_text(lineheight=0.7, face="bold"))
+```
+
+
+**Silver Price Histogram**
+
+```{R silver_his}
+ggplot(data=silver_df, aes(silver_df$USD)) +
+  geom_histogram(aes(fill = ..count..)) +
+  scale_fill_gradient("Count", low = "grey", high = "ivory4")
+```
+
+**Gold/Silver Price Ratio Data**
+
+```{R _ratio}
+ggplot (PriceDataYear_2001_2013, aes(as.Date(Date), PriceRatio)) +
+  geom_line (aes(color="Blue")) +
+  labs (color="Legend") +
+  scale_colour_manual ("", breaks = c("gold"), values = c("goldenrod3")) +
+  ggtitle ("Gold and Silver Price Ratio") +
+  theme (plot.title = element_text(lineheight=0.7, face="bold"))
+```
+
+**Gold/Silver Price Ratio Histogram**
+
+```{R hist_Price_ratio}
+ggplot(data=PriceDataYear_2001_2013, aes(PriceDataYear_2001_2013$PriceRatio)) +
+  geom_histogram(aes(fill = ..count..)) +
+  scale_fill_gradient("Count", low = "grey", high = "blue") +
+  ggtitle ("Gold and Silver Price Ratio Histogram")
+```
+
+

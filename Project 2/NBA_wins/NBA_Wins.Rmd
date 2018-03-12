@@ -1,0 +1,84 @@
+---
+title: "NBA_win"
+author: "anjal hussan"
+date: "3/11/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+###Date Source:
+Franchise wins for each NBA basketball team from 1946-2015:
+http://www.basketball-reference.com/leagues/NBA_wins.html
+
+###Analysis:
+
+1) Most overall wins of the lifetime of the NBA
+
+2) Most wins by a team over the time span
+
+3) Most wins by a team by year
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(DT)
+```
+
+As we know our questions, let's define some function which we could call later in our analysis section:
+
+```{r message=FALSE, warning=FALSE}
+get_base_data <- function(){
+  nba_df <- read.csv("leagues_NBA_wins.csv", header = TRUE, sep = ",") %>%
+    filter(Rk != 'Rk', Season != 'Total')
+  nba_df$Season <- gsub("-", "", nba_df$Season)
+  return (nba_df)
+}
+
+get_winners <- function(subset_df){
+  the_teams_names <- colnames(subset_df)
+  mtrx <- matrix(as.numeric(unlist(subset_df)),nrow=nrow(subset_df))
+  df <- as.data.frame(colSums(mtrx))
+  colnames(df) <- c("wins")
+  df$team <- the_teams_names
+  head(arrange(df, desc(wins)), n=10)
+}
+
+wins_total <- function(){
+  get_base_data() %>% 
+    subset(select = -c(Rk,Season,Lg)) %>% 
+    get_winners()
+}
+
+most_wins_for_interval <- function(start_season, end_season){
+  start_season <- gsub("-", "", start_season)
+  end_season <- gsub("-", "", end_season)
+
+  get_base_data() %>% 
+    subset(select = -c(Rk,Lg)) %>% 
+    filter(Season >= start_season & Season <= end_season) %>% 
+    subset(select = -c(Season)) %>% 
+    get_winners()
+}
+
+most_win_in_a_Season <- function(season){
+  most_wins_for_interval(season, season)
+}
+```
+
+### Most Wins:
+
+```{r message=FALSE, warning=FALSE}
+datatable(wins_total())
+```
+
+### Most wins by a team over the time span
+
+```{r message=FALSE, warning=FALSE}
+datatable(most_wins_for_interval('1990-91', '1999-00'))
+```
+
+### Most wins by a team by year
+
+```{r message=FALSE, warning=FALSE}
+datatable(most_win_in_a_Season('1989-90'))
+```
