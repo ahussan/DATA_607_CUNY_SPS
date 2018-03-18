@@ -1,0 +1,75 @@
+---
+title: "Work_with_html_xml_json 7"
+author: "anjal hussan"
+date: "3/18/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+Our goal is to create a list of books stored in an HTML table, an XML file, and a JSON file and use R to read and parse the files and store in 3 data frames.
+
+# Environment Prep
+```{r, warning=FALSE, message=FALSE}
+if (!require('rvest')) install.packages('rvest')
+if (!require('XML')) install.packages('XML')
+if (!require('jsonlite')) install.packages('jsonlite')
+library('DT')
+```
+
+# Read Data
+
+## HTML Table
+```{r}
+h <- read_html("books.html") 
+h.df <- data.frame(html_table(h))
+knitr::kable(h.df)
+```
+
+## XML
+```{r}
+x <- xmlParse("books.xml")
+x.df <- xmlToDataFrame(x)
+knitr::kable(x.df)
+```
+
+## JSON
+```{r}
+j <- fromJSON("books.json")
+j.df <- do.call("rbind", lapply(j, data.frame, stringsAsFactors=FALSE))
+rownames(j.df) <- NULL
+knitr::kable(j.df)
+```
+
+# Similarities
+
+Overall, all the datafram looks same. But we need some deterministic test to confirm if they are same. We can use the base package function 'all.equal' to test.    
+
+## HTML to XML
+```{r}
+all.equal(h.df, x.df)
+```
+
+## HTML to JSON
+```{r}
+all.equal(h.df, j.df)
+```
+
+## XML to JSON
+```{r}
+all.equal(x.df, j.df)
+```
+
+# Conclusion
+Although the data frames look same, it would take some additional work to make them completely equivalent. The classes are different. Most importantly the xml import method mad each variable a factor.
+
+
+
+
