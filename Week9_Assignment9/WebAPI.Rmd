@@ -1,0 +1,72 @@
+---
+title: "Web APIs; Week 9"
+author: "anjal hussan"
+date: "4/8/2018"
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Abstract
+
+Our task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it to an R dataframe. 
+
+# Environment Prep
+```{r, warning=FALSE, message=FALSE}
+if (!require('jsonlite')) install.packages('jsonlite')
+if (!require('dplyr')) install.packages('dplyr')
+if (!require('stringr')) install.packages('stringr')
+```
+
+# Importing
+
+We will be using Top Stories V1 API and look for stories in the Technology section.  
+
+## Key Config
+
+I stored API developer Key in a .R file and sourced accordingly in the code. This file won't be checked in to the git repository
+
+```{r}
+# get our API key
+source("key.R")
+
+# add text required for call
+addkey <- paste0("&api-key=", key)
+```
+
+## GET
+
+Get call to the API endpoint and get the feed
+
+```{r}
+# add url and text required for call
+url <- "https://api.nytimes.com/svc/topstories/v1/technology.json"
+addurl <- paste0(url, "?")
+
+# make call
+feed <- fromJSON(paste0(addurl, addkey))
+```
+
+# Setup DF
+
+```{r}
+sub <- feed$results
+sub$pub_date <- unlist(str_extract(sub$published_date, ".+?(?=T)"))
+sub$pub_time <- unlist(str_extract(sub$published_date, "(?<=T)(.*)"))
+
+sub <- sub %>% 
+    filter(section == "Technology") %>% 
+    select(title, abstract, byline, url, pub_date, pub_time)
+```
+
+## Conclusion
+
+```{r}
+
+knitr::kable(sub)
+```
