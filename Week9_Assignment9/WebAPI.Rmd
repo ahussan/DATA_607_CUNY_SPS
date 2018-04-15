@@ -21,6 +21,7 @@ Our task is to choose one of the New York Times APIs, construct an interface in 
 if (!require('jsonlite')) install.packages('jsonlite')
 if (!require('dplyr')) install.packages('dplyr')
 if (!require('stringr')) install.packages('stringr')
+library('DT')
 ```
 
 # Importing
@@ -50,6 +51,7 @@ addurl <- paste0(url, "?")
 
 # make call
 feed <- fromJSON(paste0(addurl, addkey))
+
 ```
 
 # Setup DF
