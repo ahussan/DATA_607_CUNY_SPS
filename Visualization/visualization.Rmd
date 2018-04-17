@@ -1,0 +1,161 @@
+---
+title: "visualization"
+author: "anjal hussan"
+date: "4/15/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("ggcorrplot")
+#install.packages("ggplot2")
+#install.packages("ggthemes")
+library(ggplot2)
+library(ggcorrplot)
+library(ggthemes)
+
+```
+
+##Data
+We’ll use ‘Big Mart data’ set from a publicly available source to understand visualizations in R
+
+```{R load from github}
+giturl = "https://raw.githubusercontent.com/ahussan/DATA_607_CUNY_SPS/master/Presentation/Big%20Mart.csv"
+marketdata = read.table(giturl, sep = ",", stringsAsFactors = FALSE, header = TRUE)
+head(marketdata)
+
+cat("Number of rows in the dataset: ", nrow(marketdata),"\n")
+cat("Number of columns in the dataset: ", ncol(marketdata), "\n")
+```
+
+## Scatter Plot
+
+Scatter Plot is used to see the relationship between two continuous variables.
+
+In our dataset, if we want to visualize the items as per their cost data, then we can use scatter plot chart using two continuous variables, namely Item_Visibility & Item_MRP as shown below.
+
+```{r}
+ggplot(marketdata, aes(Item_Visibility, Item_MRP)) + geom_point() + scale_x_continuous("Item Visibility", breaks = seq(0,0.35,0.05))+ scale_y_continuous("Item MRP", breaks = seq(0,270,by = 30))+ theme_bw()
+
+#aes = how variables in the data are mapped to visual properties
+```
+
+
+We can even make it more visually clear by creating separate scatter plots for each separate Item_Type:
+
+```{r}
+ggplot(marketdata, aes(Item_Visibility, Item_MRP)) +
+  geom_point(aes(color = Item_Type)) + 
+  scale_x_continuous("Item Visibility", breaks = seq(0,0.35,0.05))+
+  scale_y_continuous("Item MRP", breaks = seq(0,270,by = 30))+ 
+  labs(title="Scatterplot") + facet_wrap( ~ Item_Type)
+```
+
+##Histogram
+Histogram is used to plot continuous variable. It breaks the data into different buckets and shows frequency distribution of these buckets.
+
+From our dataset, if we want to know the count of items on basis of their cost, then we can plot histogram using continuous variable Item_MRP as shown below.
+
+```{r}
+theme_set(theme_classic())
+
+# Histogram on a Categorical variable
+g <- ggplot(mpg, aes(manufacturer))
+g + geom_bar(aes(fill=class), width = 0.5) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+  labs(title="Histogram on Categorical Variable", 
+       subtitle="Manufacturer across Vehicle Classes") 
+```
+##Bar charts
+
+Bar charts are recommended when we want to plot a categorical variable or a combination of continuous and categorical variable.
+
+From our dataset, if we want to know number of marts established in particular year, then bar chart would be most suitable option, use variable Establishment Year as shown below.
+
+```{r}
+ggplot(marketdata, aes(Outlet_Establishment_Year)) + geom_bar(fill = "red")+theme_bw()+
+  scale_x_continuous("Establishment Year", breaks = seq(1985,2010, 2)) + 
+  scale_y_continuous("Count", breaks = seq(0,1500,150)) +
+  labs(title = "Bar Chart")
+```
+
+
+##Box Plot
+
+Box Plots are used to plot a combination of categorical and continuous variables. This plot is useful for visualizing the spread of the data and detect outliers. It shows statistically significant numbers:
+The dark line inside the box represents the median
+The top of box is 75%ile 
+bottom of box is 25%ile
+
+From any dataset, if we want to identify important data points including minimum, maximum & median numbers, box plot can be helpful.
+
+```{r}
+theme_set(theme_classic())
+
+# Plot
+g <- ggplot(mpg, aes(class, cty))
+g + geom_boxplot(varwidth=T, fill="plum") + 
+    labs(title="Box plot", 
+         subtitle="City Mileage grouped by Class of vehicle",
+         caption="Source: mpg",
+         x="Class of Vehicle",
+         y="City Mileage")
+```
+
+##Correlogram
+
+Correlogram is used to test the level of co-relation among the variable available in the data set. The cells of the matrix can be shaded or colored to show the co-relation value.
+
+Darker the color, higher the co-relation between variables. Positive co-relations are displayed in blue and negative correlations in red color. Color intensity is proportional to the co-relation value.
+
+From our dataset, let’s check co-relation between Item cost, weight, visibility along with Outlet establishment year and Outlet sales from below plot.
+
+In our example, we can see that Item cost & Outlet sales are positively correlated while Item weight & its visibility are negatively correlated.
+,data visualizations R
+
+Here is the R code for simple correlogram using function corrgram().
+```{r}
+
+# Correlation matrix
+data(mtcars)
+corr <- round(cor(mtcars), 1)
+
+# Plot
+ggcorrplot(corr, hc.order = TRUE, 
+           type = "lower", 
+           lab = TRUE, 
+           lab_size = 3, 
+           method="circle", 
+           colors = c("tomato2", "white", "springgreen3"), 
+           title="Correlogram of mtcars", 
+           ggtheme=theme_bw)
+
+```
+
+##Population Pyramid
+
+Population pyramids offer a unique way of visualizing how much population or what percentage of population fall under a certain category. The below pyramid is an excellent example of how many users are retained at each stage of a email marketing campaign funnel.
+
+```{r}
+
+options(scipen = 999)  # turns of scientific notations like 1e+40
+
+# Read data
+email_campaign_funnel <- read.csv("https://raw.githubusercontent.com/selva86/datasets/master/email_campaign_funnel.csv")
+
+# X Axis Breaks and Labels 
+brks <- seq(-15000000, 15000000, 5000000)
+lbls = paste0(as.character(c(seq(15, 0, -5), seq(5, 15, 5))), "m")
+
+# Plot
+ggplot(email_campaign_funnel, aes(x = Stage, y = Users, fill = Gender)) +   # Fill column
+                              geom_bar(stat = "identity", width = .6) +   # draw the bars
+                              scale_y_continuous(breaks = brks,   # Breaks
+                                                 labels = lbls) + # Labels
+                              coord_flip() +  # Flip axes
+                              labs(title="Email Campaign Funnel") +
+                              theme(plot.title = element_text(hjust = .5), 
+                                    axis.ticks = element_blank()) +   # Centre plot title
+                              scale_fill_brewer(palette = "Dark2")  # Color palette
+
+```
