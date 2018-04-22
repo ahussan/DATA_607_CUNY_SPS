@@ -1,11 +1,14 @@
 ---
-title: "visualization"
+title: "Visualization"
 author: "anjal hussan"
 date: "4/15/2018"
-output: html_document
+output: 
+  html_document:
+    theme: lumen
+    toc: yes
 ---
 
-```{r setup, include=FALSE}
+```{r setup}
 knitr::opts_chunk$set(echo = TRUE)
 #install.packages("ggcorrplot")
 #install.packages("ggplot2")
@@ -13,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(ggcorrplot)
 library(ggthemes)
+library(DT)
 
 ```
 
@@ -20,12 +24,12 @@ library(ggthemes)
 We’ll use ‘Big Mart data’ set from a publicly available source to understand visualizations in R
 
 ```{R load from github}
-giturl = "https://raw.githubusercontent.com/ahussan/DATA_607_CUNY_SPS/master/Presentation/Big%20Mart.csv"
+giturl = "https://raw.githubusercontent.com/ahussan/DATA_607_CUNY_SPS/master/Visualization/Big%20Mart.csv"
 marketdata = read.table(giturl, sep = ",", stringsAsFactors = FALSE, header = TRUE)
-head(marketdata)
-
 cat("Number of rows in the dataset: ", nrow(marketdata),"\n")
 cat("Number of columns in the dataset: ", ncol(marketdata), "\n")
+datatable(marketdata)
+
 ```
 
 ## Scatter Plot
@@ -54,7 +58,7 @@ ggplot(marketdata, aes(Item_Visibility, Item_MRP)) +
 ##Histogram
 Histogram is used to plot continuous variable. It breaks the data into different buckets and shows frequency distribution of these buckets.
 
-From our dataset, if we want to know the count of items on basis of their cost, then we can plot histogram using continuous variable Item_MRP as shown below.
+In this example I used MPG data set, we are going to find the count of cars by manufacturer
 
 ```{r}
 theme_set(theme_classic())
@@ -66,11 +70,12 @@ g + geom_bar(aes(fill=class), width = 0.5) +
   labs(title="Histogram on Categorical Variable", 
        subtitle="Manufacturer across Vehicle Classes") 
 ```
+
 ##Bar charts
 
 Bar charts are recommended when we want to plot a categorical variable or a combination of continuous and categorical variable.
 
-From our dataset, if we want to know number of marts established in particular year, then bar chart would be most suitable option, use variable Establishment Year as shown below.
+Here, I used our mart data set.  if we want to know number of marts established in particular year, then bar chart would be most suitable option, use variable Establishment Year as shown below.
 
 ```{r}
 ggplot(marketdata, aes(Outlet_Establishment_Year)) + geom_bar(fill = "red")+theme_bw()+
@@ -83,8 +88,11 @@ ggplot(marketdata, aes(Outlet_Establishment_Year)) + geom_bar(fill = "red")+them
 ##Box Plot
 
 Box Plots are used to plot a combination of categorical and continuous variables. This plot is useful for visualizing the spread of the data and detect outliers. It shows statistically significant numbers:
+
 The dark line inside the box represents the median
+
 The top of box is 75%ile 
+
 bottom of box is 25%ile
 
 From any dataset, if we want to identify important data points including minimum, maximum & median numbers, box plot can be helpful.
@@ -108,7 +116,7 @@ Correlogram is used to test the level of co-relation among the variable availabl
 
 Darker the color, higher the co-relation between variables. Positive co-relations are displayed in blue and negative correlations in red color. Color intensity is proportional to the co-relation value.
 
-From our dataset, let’s check co-relation between Item cost, weight, visibility along with Outlet establishment year and Outlet sales from below plot.
+From our Mart dataset, let’s check co-relation between Item cost, weight, visibility along with Outlet establishment year and Outlet sales from below plot.
 
 In our example, we can see that Item cost & Outlet sales are positively correlated while Item weight & its visibility are negatively correlated.
 ,data visualizations R
@@ -138,7 +146,7 @@ Population pyramids offer a unique way of visualizing how much population or wha
 
 ```{r}
 
-options(scipen = 999)  # turns of scientific notations like 1e+40
+options(scipen = 999)  # turn off scientific notations i.e. 1e+40
 
 # Read data
 email_campaign_funnel <- read.csv("https://raw.githubusercontent.com/selva86/datasets/master/email_campaign_funnel.csv")
@@ -159,3 +167,10 @@ ggplot(email_campaign_funnel, aes(x = Stage, y = Users, fill = Gender)) +   # Fi
                               scale_fill_brewer(palette = "Dark2")  # Color palette
 
 ```
+
+
+Sources:
+Data camp
+R for Data Science
+https://www.r-bloggers.com
+https://www.analyticsvidhya.com

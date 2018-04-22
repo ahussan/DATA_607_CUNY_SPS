@@ -1,0 +1,180 @@
+---
+title: "Recommender System"
+author: "anjal hussan"
+date: "4/22/2018"
+output:
+  html_document: default
+  pdf_document: default
+  prettydoc::html_pretty:
+    highlight: github
+    theme: leonids
+    toc: yes
+---
+
+```{r, include=FALSE}
+#install.packages('ggplot2')
+#install.packages("knitr")
+#install.packages("rmarkdown")
+```
+**Recommender Systems: Google**
+
+Google is an American multinational technology company specializing in Internet-related services and products. These include online advertising technologies, search, cloud computing, software, and hardware(Wikipedia)
+
+# Google Cloud Prediction API: 
+
+As per their description Found in the documentation:
+
+"Google Cloud Prediction API provides a RESTful API to build Machine Learning models. Prediction's cloud-based machine learning tools can help analyze your data to add various features to your applications, such as customer sentiment analysis, spam detection, recommendation systems, and more."
+
+### Use Cases
+
+**Sentiment Analysis**
+
+Create a basic sentiment analysis model using the Google Prediction API:
+A sentiment analysis model is used to analyze a text string and classify it with one of the labels that you provide; for example, you could analyze a tweet to determine whether it is positive or negative, or analyze an email to determine whether it is happy, frustrated, or sad. You should read the Hello Prediction page before reading this introduction.
+
+Create sentiment analysis model requires following steps:
+
+Step 1: Collect Data.
+
+Step 2: Label Your Data.
+
+Step 3: Prepare Your Data.
+
+Step 4: Upload Data to Google Cloud Storage.
+
+Step 5: Train a Model with the Google Prediction API.
+
+Step 6: Make Predictions with the Google Prediction API in your application.
+
+Step 7: Update Your Model with New Data.
+
+### API Reference 
+
+In this section it provides a tremendous amount of information on how this API reference is organized by resource type. Each resource type has one or more data representations and one or more methods.
+
+Resource types:
+
+- Hostedmodels 
+
+- Trainedmodels
+
+- Standard Query Parameters 
+
+### Samples and Libraries 
+
+Something very nice is that The Google Prediction API is built on HTTP and JSON, so any standard HTTP client can send requests to it and parse the responses.
+
+However, the Google APIs client libraries provide better language integration, improved security, and support for making calls that require user authorization. The client libraries are available in a number of programming languages; by using them you can avoid the need to manually set up HTTP requests and parse the responses.
+
+- Go
+
+- Java
+
+- Javascript
+
+- .Net
+
+- Node.JS
+
+- OBJ-C
+
+- PHP
+
+- Python
+
+- Ruby
+
+### Prediction Gallery
+
+They also have a set of predictions gallery:
+
+**Language Identifier** as a Demo only. It analyzes a sentence to determine whether it is English, Spanish, or French.
+
+**Tag Categorizer** as a demo only. Tags a given comment as pertaining to android, appengine, chrome, or youtube. Training data comes from a collection of social media comments. 
+
+**Sentiment Predictor** as a demo only. Analyzes the sentiment of a short English-language text snippet.
+
+One of the cool things they allow is that we can submit our own model.
+
+### Performance Tips
+
+Some of the very important things to consider that they provide in their document is that it covers some techniques you can use to improve the performance of your application. In some cases, examples from other APIs or generic APIs are used to illustrate the ideas presented. However, the same concepts are applicable to the Google Prediction API.
+
+- Using gzip
+
+- Working with partial resources
+
+### Batching HTTP Requests 
+
+The Google Prediction API supports batching, to allow clients to put several API calls into a single HTTP request.
+
+It provides examples and step by step, simplifying the process of how to.
+
+
+# Building the Google Recommendation Engine
+
+"GCP frees you from the overhead of managing infrastructure, provisioning servers and configuring networks. To let innovators innovate and let coders, well, just code."
+
+One of Google philosophies is that we don't need to get our hands "dirty" if we try to create or innovate, hence they provide a series of services that help achieve that goal.
+
+One of their goals is to enhance collaboration and expertise in many ways; by providing cloud computing services they provide incredible robust tools that help minimize the amount of work to be done.
+
+Their current approach is based in simplicity and centralized expertise; something useful when sometimes we feel trapped in multiple forms the web has to offer.
+
+Their environment is always evolving with products and services; hence sometimes they discontinue the support on some of the under performing services or older products.
+
+A very important part of their commerce is the incredible spread amount of products and services they offer; that provides strength in multiple levels and touches many lives in a split of a second; making them quite important factor of our civilization as we know it.
+
+# Google Scenario Design
+
+## Analysis
+
+### Target users: 
+Google's target users are all (businesses and users); it all depends of the product or service.
+
+### Key goals?
+
+**Mission:** Organize the world's information and make it universally accessible and useful.
+
+**Purpose:** Allow users to be able to find information in many different languages; check stock quotes, maps, and news headlines; lookup phonebook listings for every city in the United States; search billions of images and peruse the world's largest archive of Usenet messages. In addition, support thousands of advertisers to use Google’s AdWords program to promote their products and services on the web with targeted advertising.
+
+**Vision:** 
+
+- Short-term objectives: are to expand the workforce for anticipated growth, expand further into international markets, and continue developing new products.
+
+- Long-term objective: delivering new advertising technology. Expanding the workforce will help achieve the long-term goals. Google's organization structure is primarily functional but also includes a few geographical organizations. 
+
+
+**Philosophy:** Google does not document a Vision or Values on the Google website. They do state a philosophy on the Google website, some are listed below:
+
+- Focus on the user and all else will follow
+
+- It's best to do one thing really, really well.
+
+- Fast is better than slow.
+
+- You don't need to be at your desk to need an answer.
+
+- No pop-ups.
+
+
+# Conclusion
+
+The Google Prediction API is a generic machine learning service and can be used to solve almost any regression or classification type problem.
+
+A downside is that some of the models they present are provided temporarily for demonstration purposes only and may be removed without notice at any time. Therefore they advise against building commercial and/or production services using those models.
+
+# References:
+
+https://en.wikipedia.org/wiki/Google
+
+https://www.google.com/intl/en/about/products/
+
+https://en.wikipedia.org/wiki/Recommender_system
+
+https://cloud.google.com/why-google/
+
+https://hbr.org/2008/04/reverse-engineering-googles-innovation-machine
+
+http://www.123helpme.com/strategic-planning-process-google-view.asp?id=167474
