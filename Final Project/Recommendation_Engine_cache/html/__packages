@@ -1,0 +1,10 @@
+base
+SlopeOne
+data.table
+lazyeval
+ggplot2
+plotly
+jsonlite
+dplyr
+readr
+knitr
