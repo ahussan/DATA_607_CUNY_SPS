@@ -9,8 +9,20 @@ output:
   pdf_document:
     toc: yes
 ---
-
+## Install and Load packages
 ```{r global, include=T, warning=FALSE,  results='hide', quietly=TRUE, warn.conflicts = FALSE}
+suppressMessages(if (!require("devtools")) install.packages("devtools", repos='http://cran.rstudio.com/'))
+library(devtools)
+suppressMessages(if (!require("SlopeOne")) install_github("tarashnot/SlopeOne", type = "source"))
+suppressMessages(if (!require("data.table")) install.packages("data.table", repos='http://cran.rstudio.com/'))
+suppressMessages(if (!require("lazyeval")) install.packages("lazyeval", repos='http://cran.rstudio.com/'))
+suppressMessages(if (!require("plotly")) install.packages("plotly", repos='http://cran.rstudio.com/'))
+suppressMessages(if (!require("jsonlite")) install.packages("jsonlite", repos='http://cran.rstudio.com/'))
+suppressMessages(if (!require("dplyr")) install.packages("dplyr", repos='http://cran.rstudio.com/'))
+suppressMessages(if (!require("readr")) install.packages("readr", repos='http://cran.rstudio.com/'))
+suppressMessages(if (!require("knitr")) install.packages("knitr", repos='http://cran.rstudio.com/'))
+
+#Library
 library("SlopeOne")
 library("data.table")
 library("lazyeval")
@@ -64,8 +76,6 @@ ratings[, item_id := as.character(item_id)]
 artists = fread("data/artists.dat")
 artists[,id := as.character(id)]
 setkey(artists, id)
-
-
 ```
 
 ### Exploration: Distributions  
@@ -235,8 +245,7 @@ We process this user input
 # New user inputs a list of artist names, some other sets of inputs provided for testing
 
 userinput = c("Madonna","Lady Gaga", "Rihanna", "Bruno Mars")
-# userinput = c("Slipknot","In Flames")
-# userinput = c("Oasis", "Blur", "Garbage")
+
 
 
 userinput = tolower(userinput)
@@ -291,7 +300,6 @@ Prediction finished in `r finish[3]` seconds.
 The output of the top-N function looks as follows:
 
 ```{r}
-#load('stringi')
 kable(top_artists)
 ```
 

@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/386487/7a632085ea374207994a36dfbe68417f
+bundleId: https://api.rpubs.com/api/v1/document/386487/7a632085ea374207994a36dfbe68417f
+url: http://rpubs.com/ahussan/386487
+when: 1526311014.20813
